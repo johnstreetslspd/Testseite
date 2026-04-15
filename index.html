@@ -8,53 +8,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
-        
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-        
+       
+        body { font-family: 'Inter', system-ui, sans-serif; }
+       
         .neon-text {
-            text-shadow: 
-                0 0 10px #00ffea,
-                0 0 20px #00ffea,
-                0 0 40px #00ffea;
+            text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea, 0 0 40px #00ffea;
             animation: neon-pulse 2s ease-in-out infinite alternate;
         }
-        
+       
         @keyframes neon-pulse {
             from { text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea; }
             to   { text-shadow: 0 0 20px #00ffea, 0 0 40px #00ffea, 0 0 60px #00ffea; }
         }
-        
+       
         .hero-bg {
-            background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.95)), url('https://source.unsplash.com/random/1920x1080/?cyberpunk,city,night') center/cover no-repeat fixed;
+            background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.95)), 
+                        url('https://source.unsplash.com/random/1920x1080/?cyberpunk,city,night') center/cover no-repeat fixed;
         }
         
-        .section-fade {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .section-fade.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .rule-card {
+        .music-toggle {
             transition: all 0.3s ease;
         }
-        .rule-card:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 0 25px rgba(0, 255, 234, 0.3);
+        .music-toggle:hover {
+            transform: scale(1.1);
+            color: #00ffea;
         }
         
-        canvas#particles { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            pointer-events: none; 
-            z-index: 1;
+        #youtube-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -63,7 +48,23 @@
     <!-- HERO -->
     <section class="hero-bg min-h-screen flex items-center relative">
         <canvas id="particles" class="absolute inset-0"></canvas>
-        
+       
+        <!-- YouTube Player (versteckt) -->
+        <iframe id="youtube-player" 
+                src="https://www.youtube.com/embed/2AzuBKfeluE?autoplay=0&loop=1&playlist=DEINE_YOUTUBE_VIDEO_ID&controls=0&modestbranding=1&rel=0"
+                allow="autoplay" 
+                frameborder="0"></iframe>
+
+        <!-- Musik Steuerung -->
+        <div class="absolute top-6 right-6 z-50">
+            <button id="music-toggle" 
+                    class="music-toggle bg-zinc-900/80 hover:bg-zinc-800 backdrop-blur-xl border border-zinc-700 hover:border-emerald-500 
+                           text-white px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl">
+                <i id="music-icon" class="fas fa-music text-2xl"></i>
+                <span id="music-text" class="font-medium">Musik an</span>
+            </button>
+        </div>
+
         <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
             <div class="inline-flex items-center gap-3 bg-zinc-900/80 backdrop-blur-xl px-8 py-3 rounded-3xl border border-emerald-500/30 mb-8">
                 <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -76,19 +77,16 @@
             <p class="text-3xl text-zinc-400 mb-10 max-w-2xl mx-auto">Deutscher FiveM Roleplay Server • Realistisch • Community • No Pay-to-Win</p>
 
             <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-                <!-- Discord -->
                 <a href="https://discord.gg/DEIN_DISCORD_INVITE" target="_blank"
                    class="group relative bg-[#5865F2] hover:bg-[#4752C4] transition-all duration-300 text-white font-bold text-2xl px-12 py-7 rounded-3xl flex items-center gap-5 shadow-2xl shadow-[#5865F2]/60 overflow-hidden">
                     <i class="fab fa-discord text-4xl"></i>
                     <div>
                         <span class="block">DISCORD BEITRETEN</span>
-                        <span class="text-sm opacity-75">Jetzt Mitgliede werden!</span>
+                        <span class="text-sm opacity-75">Jetzt Mitglied werden!</span>
                     </div>
-                    <div class="absolute inset-0 bg-white/10 scale-0 group-active:scale-100 transition-transform origin-center"></div>
                 </a>
 
-                <!-- FiveM -->
-                <a href="fivem://connect/DEINE_FIVEM_IP:30120" 
+                <a href="fivem://connect/DEINE_FIVEM_IP:30120"
                    class="group relative bg-zinc-900 hover:bg-emerald-500/10 border-2 border-emerald-500 hover:border-emerald-400 transition-all duration-300 font-bold text-2xl px-12 py-7 rounded-3xl flex items-center gap-5">
                     <i class="fas fa-gamepad text-4xl text-emerald-400"></i>
                     <div>
@@ -98,14 +96,13 @@
                 </a>
             </div>
 
-            <!-- Live Discord Stats -->
             <div class="flex justify-center gap-12 text-center">
                 <div>
-                    <div id="total-members" class="text-5xl font-black text-white tabular-nums"></div>
+                    <div id="total-members" class="text-5xl font-black text-white tabular-nums">0</div>
                     <div class="text-zinc-400 text-sm tracking-widest">MITGLIEDER</div>
                 </div>
                 <div>
-                    <div id="online-members" class="text-5xl font-black text-emerald-400 tabular-nums"></div>
+                    <div id="online-members" class="text-5xl font-black text-emerald-400 tabular-nums">0</div>
                     <div class="text-zinc-400 text-sm tracking-widest">ONLINE</div>
                 </div>
                 <div>
@@ -121,25 +118,23 @@
         </div>
     </section>
 
-    <!-- REGELN SECTION (dynamisch vom Bot) -->
+    <!-- REGELN SECTION -->
     <section id="rules-section" class="py-24 bg-zinc-900">
         <div class="max-w-5xl mx-auto px-6">
             <h2 class="text-5xl font-black text-center mb-4 neon-text">SERVER REGELN</h2>
             <p class="text-center text-zinc-400 mb-16">Live aus unserem Discord gezogen • Aktualisieren sich automatisch</p>
-            
-            <div id="rules-container" class="grid md:grid-cols-2 gap-6">
-                <!-- Wird per JavaScript mit Daten vom Bot gefüllt -->
-            </div>
+           
+            <div id="rules-container" class="grid md:grid-cols-2 gap-6"></div>
         </div>
     </section>
 
-    <!-- Weitere moderne Sections mit Animationen -->
+    <!-- Info Sections -->
     <section class="py-20 bg-black">
         <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8">
             <div class="section-fade bg-zinc-900 rounded-3xl p-8">
                 <i class="fas fa-users text-5xl text-purple-400 mb-6"></i>
                 <h3 class="text-3xl font-bold mb-3">Starke Community</h3>
-                <p class="text-zinc-400">Tägliche Events, Clan-Kriege und realistisches RP mit über 1.200 Mitgliedern.</p>
+                <p class="text-zinc-400">Tägliche Events, Clan-Kriege und realistisches RP mit einer aktiven Community.</p>
             </div>
             <div class="section-fade bg-zinc-900 rounded-3xl p-8">
                 <i class="fas fa-gavel text-5xl text-amber-400 mb-6"></i>
@@ -156,23 +151,20 @@
 
     <!-- Footer -->
     <footer class="bg-zinc-950 py-12 border-t border-zinc-800 text-center text-zinc-500 text-sm">
-        © 2026 SHADOW LEGION • FiveM Roleplay Clan • <span id="last-updated"></span>
+        © 2026 Blacklight Roleplay • FiveM Server • <span id="last-updated"></span>
     </footer>
 
     <script>
-        // ==================== TAILWIND + ANIMATION SETUP ====================
-        tailwind.config = { content: ["*"] }
-
-        // ==================== CANVAS PARTICLES (modern & performant) ====================
+        // ==================== PARTICLES, COUNTERS, DISCORD DATA (wie vorher) ====================
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         let particlesArray = [];
-        
+
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        
+
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
@@ -182,11 +174,7 @@
                 this.speedY = Math.random() * -1.5 - 0.5;
                 this.color = '#00ffea';
             }
-            update() {
-                this.y += this.speedY;
-                this.x += this.speedX;
-                if (this.y < 0) this.y = canvas.height;
-            }
+            update() { this.y += this.speedY; this.x += this.speedX; if (this.y < 0) this.y = canvas.height; }
             draw() {
                 ctx.fillStyle = this.color;
                 ctx.globalAlpha = 0.4;
@@ -195,113 +183,97 @@
                 ctx.fill();
             }
         }
-        
+
         function initParticles() {
             particlesArray = [];
-            for (let i = 0; i < 120; i++) {
-                particlesArray.push(new Particle());
-            }
+            for (let i = 0; i < 120; i++) particlesArray.push(new Particle());
         }
-        
+
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-            }
+            particlesArray.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
-        
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
-        });
 
-        // ==================== SCROLL ANIMATIONEN ====================
         function animateOnScroll() {
             const sections = document.querySelectorAll('.section-fade');
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
             }, { threshold: 0.2 });
-            
             sections.forEach(section => observer.observe(section));
         }
 
-        // ==================== ANIMATED COUNTERS ====================
-        function animateCounter(id, target, duration = 1800) {
+        function animateCounter(id, target) {
             let start = 0;
-            const increment = target / (duration / 16);
             const element = document.getElementById(id);
-            
             const timer = setInterval(() => {
-                start += increment;
-                if (start >= target) {
-                    start = target;
-                    clearInterval(timer);
-                }
+                start += target / 100;
+                if (start >= target) { start = target; clearInterval(timer); }
                 element.textContent = Math.floor(start).toLocaleString('de-DE');
             }, 16);
         }
 
-        // ==================== LIVE DATA VOM DISCORD BOT ====================
-        const BOT_API = "https://DEINE_BOT_URL.de/api";   // ← HIER DEINE BOT-URL EINTRAGEN (z. B. http://deine-vserver-ip:3000/api)
+        const BOT_API = "http://DEINE_VSERVER_IP:3000/api";
 
         async function loadDiscordData() {
             try {
-                // Stats
-                const statsRes = await fetch(`${BOT_API}/stats`);
-                const stats = await statsRes.json();
-                
-                // Counter animieren
+                const stats = await (await fetch(`${BOT_API}/stats`)).json();
+                const rulesData = await (await fetch(`${BOT_API}/rules`)).json();
+
                 animateCounter('total-members', stats.totalMembers || 1247);
                 animateCounter('online-members', stats.onlineMembers || 89);
-                
-                // Rules
-                const rulesRes = await fetch(`${BOT_API}/rules`);
-                const rulesData = await rulesRes.json();
-                
+
                 const container = document.getElementById('rules-container');
-                container.innerHTML = rulesData.rules.map((rule, index) => `
+                container.innerHTML = rulesData.rules.map((rule, i) => `
                     <div class="rule-card bg-zinc-800/70 backdrop-blur-xl border border-zinc-700 rounded-3xl p-8 flex gap-6">
-                        <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center font-black text-xl flex-shrink-0">
-                            ${index + 1}
-                        </div>
+                        <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center font-black text-xl">${i+1}</div>
                         <p class="text-lg leading-relaxed">${rule}</p>
                     </div>
                 `).join('');
-                
-                // Timestamp
+
                 document.getElementById('last-updated').innerHTML = `Letzte Aktualisierung: <span class="text-emerald-400">${new Date().toLocaleTimeString('de-DE')}</span>`;
-                
             } catch (e) {
-                console.error("Fehler beim Laden der Discord-Daten", e);
-                // Fallback falls Bot offline
-                document.getElementById('rules-container').innerHTML = `
-                    <div class="col-span-2 text-center py-12 text-zinc-400">
-                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i><br>
-                        Discord Bot momentan nicht erreichbar.<br>
-                        Bitte später erneut laden.
-                    </div>`;
+                console.error(e);
             }
         }
 
-        // ==================== START ALLES ====================
+        // ==================== YOUTUBE MUSIK STEUERUNG ====================
+        const youtubePlayer = document.getElementById('youtube-player');
+        const toggleBtn = document.getElementById('music-toggle');
+        const icon = document.getElementById('music-icon');
+        const text = document.getElementById('music-text');
+        let isPlaying = false;
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                // Pause (YouTube Iframe hat keine direkte Pause-Methode über einfaches Iframe, daher neu laden mit autoplay=0)
+                const currentSrc = youtubePlayer.src;
+                youtubePlayer.src = currentSrc.replace('autoplay=1', 'autoplay=0');
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-music');
+                text.textContent = 'Musik an';
+            } else {
+                youtubePlayer.src = youtubePlayer.src.replace('autoplay=0', 'autoplay=1');
+                icon.classList.remove('fa-music');
+                icon.classList.add('fa-pause');
+                text.textContent = 'Musik aus';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // ==================== INIT ====================
         window.onload = () => {
             resizeCanvas();
-            initParticles();
+            initParticles() 
             animateParticles();
             animateOnScroll();
             loadDiscordData();
-            
-            // Alle 30 Sekunden neu laden (live)
             setInterval(loadDiscordData, 30000);
-            
-            console.log('%c✅ SHADOW LEGION Landing Page mit Discord-Bot Integration geladen!', 'color:#00ffea; font-size:14px; font-weight:bold');
+
+            console.log('%c✅ Blacklight Roleplay mit YouTube Musik geladen!', 'color:#00ffea; font-size:14px; font-weight:bold');
         };
+
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
     </script>
 </body>
 </html>
